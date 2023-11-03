@@ -6,3 +6,5 @@ const pharmacyConfirmationSchema = new mongoose.Schema({
     isConfirmed: {type: Boolean,default: false}
 })
 const pharmacyConfirmation = mongoose.model('PharmacyConfirmation',pharmacyConfirmationSchema);
+
+export default model("pharmacyConfirmation",gameSchema);

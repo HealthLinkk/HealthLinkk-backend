@@ -1,8 +1,8 @@
 import mongoose from "mongoose"
 const {Schema,model} = mongoose
 const prescriptionSchema = new mongoose.Schema({
-    doctor: {type: mongoose.Schema.Types.ObjectId, ref: 'Doctor'},
-    patient: {type: mongoose.Schema.Types.ObjectId, ref: 'Patient'},
+    doctor: {type: mongoose.Schema.Types.ObjectId, ref: 'user'},
+    patient: {type: mongoose.Schema.Types.ObjectId, ref: 'user'},
     prescriptedDrugs: [
         {
             drug: { type: mongoose.Schema.ObjectId, ref: 'Drug'},
@@ -11,3 +11,5 @@ const prescriptionSchema = new mongoose.Schema({
     ]
 });
 const Prescription = mongoose.model('Prescription',prescriptionSchema);
+
+export default model("prescription",prescriptionSchema);

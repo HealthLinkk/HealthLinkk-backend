@@ -1,6 +1,8 @@
 import  express  from 'express'; // Importer express
 import mongoose from 'mongoose'; // Importer Mongoose
 
+import userRoutes from './routes/user.js';
+
 const hostname = '127.0.0.1';
 const app =express();
 const port = process.env.port || 9090;
@@ -26,18 +28,12 @@ mongoose
 
 
 
-/**
- * Demander l'adresse (URL) de base '/'
- * à l'aide de la méthode GET de HTTP
- */
-app.get('/', (req, res) => {
-    res.send('Hello World!'); // envoyer la réponse au requérant
-
-})
 
 app.use(express.json());
 
-// app.use(gameRoutes);
+app.use('/users',userRoutes);
+
+
 /**
  * Démarrer le serveur à l'écoute des connexions
  */
