@@ -2,12 +2,12 @@ import express from 'express';
 
 const router = express.Router();
 
-import auth from '../middlewares/auth.js';
+
 
 
 
 import { PatientSignUp , login ,ProfilePicUpload ,DoctorSignUp } from '../controllers/user.js';
-  
+ import { auth, authAdminSup ,authDoctor ,authPatient ,authPharmacist } from '../middlewares/auth.js'; 
 
 
 
@@ -25,6 +25,6 @@ router
 
 router
   .route('/updatePicture')
-  .patch(auth,ProfilePicUpload);
+  .patch(authDoctor,ProfilePicUpload);
 
  export default  router;

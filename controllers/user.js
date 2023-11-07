@@ -6,10 +6,15 @@ import jwt from 'jsonwebtoken';
 import upload from '../middlewares/multerConfig.js'
 
 
-export function PatientSignUp(req, res, next) {
-      bcrypt.hash(req.body.password, 10)
-        .then((hash) => {
-          const user = new Patient({
+export async function PatientSignUp(req, res, next) {
+      try{
+      const hash = await bcrypt.hash(req.body.password, 10);
+      const existingUser = User.findOne({ email:req.body.email });
+
+      if (existingUser) {
+          return res.status(400).json({ message: "It seems you already have an account, please log in instead." }); }
+
+      const user = new Patient({
             name: req.body.name,
             lastName: req.body.lastName,
             email: req.body.email,
@@ -18,13 +23,13 @@ export function PatientSignUp(req, res, next) {
             dateNaiss: req.body.dateNaiss,
             location: req.body.location,
             role: 'Patient', 
-          });
-  
-          user.save()
-            .then(() => res.status(201).json({ message: 'Patient created!' }))
-            .catch((error) => res.status(400).json({ error }));
-        })
-        .catch((error) => res.status(500).json({ error }));
+      });
+        
+          await user.save();
+          return res.status(201).json({ message: 'Patient created!' });
+        } catch (error) {
+          return res.status(500).json({ error: error.message });
+        }
   
   };
 
