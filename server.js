@@ -2,6 +2,7 @@ import  express  from 'express'; // Importer express
 import mongoose from 'mongoose'; // Importer Mongoose
 
 import userRoutes from './routes/user.js';
+import rdvroutes from './routes/rdvroutes.js';
 
 const hostname = '127.0.0.1';
 const app =express();
@@ -32,6 +33,7 @@ mongoose
 app.use(express.json());
 
 app.use('/users',userRoutes);
+app.use('/rdv', rdvroutes);
 
 
 /**
