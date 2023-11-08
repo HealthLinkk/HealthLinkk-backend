@@ -7,4 +7,4 @@ const pharmacyConfirmationSchema = new mongoose.Schema({
 })
 const pharmacyConfirmation = mongoose.model('PharmacyConfirmation',pharmacyConfirmationSchema);
 
-export default model("pharmacyConfirmation",gameSchema);
+export default model("pharmacyConfirmation",pharmacyConfirmationSchema);

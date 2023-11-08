@@ -1,5 +1,6 @@
 import  express  from 'express'; // Importer express
 import mongoose from 'mongoose'; // Importer Mongoose
+import morgan from 'morgan';
 
 import userRoutes from './routes/user.js';
 import rdvroutes from './routes/rdvroutes.js';
@@ -27,10 +28,9 @@ mongoose
   });
 
 
-
-
-
 app.use(express.json());
+app.use(morgan("dev"));
+
 
 app.use('/users',userRoutes);
 app.use('/rdv', rdvroutes);
