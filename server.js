@@ -4,6 +4,8 @@ import morgan from 'morgan';
 
 import userRoutes from './routes/user.js';
 import rdvroutes from './routes/rdvroutes.js';
+import videoroutes from'./routes/videoroutes.js';
+import paymentroutes from './routes/paymentroutes.js'
 
 const hostname = '127.0.0.1';
 const app =express();
@@ -34,7 +36,8 @@ app.use(morgan("dev"));
 
 app.use('/users',userRoutes);
 app.use('/rdv', rdvroutes);
-
+app.use('/api/video', videoroutes);
+app.use('/api/payment', paymentroutes);
 
 /**
  * Démarrer le serveur à l'écoute des connexions

@@ -1,407 +1,216 @@
-import RendezVous from "../models/rendezvousmodel.js";
-import user from "../models/user.js";
+import RendezVous from '../models/rendezvousmodel.js';
 
+// Controller method to create a new rendezvous (accessible by both Patient and Doctor)
+export async function createRendezVous(req, res) {
+  try {
+    const { title, doctor, patient, type, startDateTime, endDateTime, location, paiement, archived } = req.body;
 
-
-
-// Get All rendezVous
-export async function getAllRendezVous(req, res, next) {
-    try {
-        const rendezvous = await RendezVous.find({archived: false}).exec();
-        res.status(200).json(rendezvous);
-    } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error' });
-        console.error(error);
+    // Ensure the logged-in user is either a Patient or a Doctor
+    if (req.auth.role !== 'Patient' && req.auth.role !== 'Doctor') {
+      return res.status(403).json({ message: 'Access denied. You do not have permission to create a rendezvous.' });
     }
-};
 
-// Get RendezVous by ID
-export async function getRendezVousById(req, res, next) {
-    try {
-        const rendezVous = await RendezVous.findById(req.params.id).exec();
-        if (!rendezVous) {
-            return res.status(404).json({ error: 'RendezVous not found' });
-        }
-        res.status(200).json(rendezVous);
-    } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error' });
-        console.error(error);
+    // If the user is a Doctor, ensure the specified doctor matches the logged-in doctor
+    if (req.auth.role === 'Doctor' && doctor.toString() !== req.auth.userId) {
+      return res.status(403).json({ message: 'Access denied. You can only create rendezvous for yourself.' });
     }
+
+    // If the user is a Patient, ensure the specified patient matches the logged-in patient
+    if (req.auth.role === 'Patient' && patient.toString() !== req.auth.userId) {
+      return res.status(403).json({ message: 'Access denied. You can only create rendezvous for yourself.' });
+    }
+
+    // Check for conflicts with existing rendezvous for the same doctor and time range
+    const existingRendezvous = await RendezVous.findOne({
+        doctor,
+        startDateTime: { $lt: endDateTime },
+        endDateTime: { $gt: startDateTime },
+        archived: false,
+      });
+  
+      if (existingRendezvous) {
+        return res.status(409).json({ message: 'Time slot is already booked. Choose another time.' });
+      }
+
+    const newRendezVous = new RendezVous({
+      title,
+      doctor,
+      patient,
+      type,
+      startDateTime,
+      endDateTime,
+      location,
+      paiement,
+      archived,
+    });
+
+    const savedRendezVous = await newRendezVous.save();
+    res.status(201).json(savedRendezVous);
+  } catch (error) {
+    res.status(500).json({ message: 'Error creating rendezvous', error: error.message });
+  }
 }
 
-
-// Create a new RendezVous
-export async function createRendezVous(req, res, next) {
+// Controller method to get all non-archived rendezvous sorted by time (accessible by both Patient and Doctor)
+export async function getAllRendezVous(req, res) {
     try {
-        const rendezVous = await RendezVous.create(req.body);
-        res.status(201).json(rendezVous);
+      // Ensure the logged-in user is either a Patient or a Doctor
+      if (req.auth.role !== 'Patient' && req.auth.role !== 'Doctor') {
+        return res.status(403).json({ message: 'Access denied. You do not have permission to view rendezvous.' });
+      }
+  
+      let query;
+  
+      // If the user is a Doctor, only return non-archived rendezvous where the doctor ID matches the logged-in doctor
+      if (req.auth.role === 'Doctor') {
+        query = { doctor: req.auth.userId, archived: false };
+      } else {
+        // If the user is a Patient, only return non-archived rendezvous where the patient ID matches the logged-in patient
+        query = { patient: req.auth.userId, archived: false };
+      }
+  
+      const rendezvousList = await RendezVous.find(query).sort({ startDateTime: 'asc' });
+      res.status(200).json(rendezvousList);
     } catch (error) {
-        res.status(400).json({ error: 'Bad Request' });
-        console.error(error);
+      res.status(500).json({ message: 'Error getting non-archived rendezvous list', error: error.message });
     }
-}
-
-
-
-// Update RendezVous by ID
-export async function updateRendezVous(req, res, next) {
+  }
+  
+  // Controller method to get a specific non-archived rendezvous by ID (accessible by both Patient and Doctor)
+  export async function getRendezVousById(req, res) {
+    const { id } = req.params;
     try {
-        const rendezVous = await RendezVous.findByIdAndUpdate(req.params.id, req.body, {
-            new: true,
-            runValidators: true,
-        }).exec();
-        if (!rendezVous) {
-            return res.status(404).json({ error: 'RendezVous not found' });
-        }
-        res.status(200).json(rendezVous);
+      const rendezvous = await RendezVous.findById(id);
+      if (!rendezvous || rendezvous.archived) {
+        return res.status(404).json({ message: 'Rendezvous not found' });
+      }
+  
+      // Ensure the logged-in user is either a Patient or a Doctor
+      if (req.auth.role !== 'Patient' && req.auth.role !== 'Doctor') {
+        return res.status(403).json({ message: 'Access denied. You do not have permission to view this rendezvous.' });
+      }
+  
+      // If the user is a Doctor, ensure the rendezvous belongs to the logged-in doctor
+      if (req.auth.role === 'Doctor' && rendezvous.doctor.toString() !== req.auth.userId) {
+        return res.status(403).json({ message: 'Access denied. You can only view your own non-archived rendezvous.' });
+      }
+  
+      // If the user is a Patient, ensure the rendezvous belongs to the logged-in patient
+      if (req.auth.role === 'Patient' && rendezvous.patient.toString() !== req.auth.userId) {
+        return res.status(403).json({ message: 'Access denied. You can only view your own non-archived rendezvous.' });
+      }
+  
+      res.status(200).json(rendezvous);
     } catch (error) {
-        res.status(400).json({ error: 'Bad Request' });
-        console.error(error);
+      res.status(500).json({ message: 'Error getting non-archived rendezvous', error: error.message });
     }
-}
+  }
+  
 
-// Delete RendezVous by ID
-export async function deleteRendezVous(req, res, next) {
+// Controller method to update a non-archived rendezvous by ID (accessible by both Patient and Doctor)
+export async function updateRendezVousById(req, res) {
+    const { id } = req.params;
     try {
-        const rendezVous = await RendezVous.findByIdAndUpdate(req.params.id,
-            { archived: true }).exec();
-        if (!rendezVous) {
-            return res.status(404).json({ error: 'RendezVous not found' });
-        }
-        res.status(200).json("deleted succesfully");
+      const rendezvous = await RendezVous.findById(id);
+      if (!rendezvous || rendezvous.archived) {
+        return res.status(404).json({ message: 'Rendezvous not found' });
+      }
+  
+      // Ensure the logged-in user is either a Patient or a Doctor
+      if (req.auth.role !== 'Patient' && req.auth.role !== 'Doctor') {
+        return res.status(403).json({ message: 'Access denied. You do not have permission to update this rendezvous.' });
+      }
+  
+      // If the user is a Doctor, ensure the rendezvous belongs to the logged-in doctor
+      if (req.auth.role === 'Doctor' && rendezvous.doctor.toString() !== req.auth.userId) {
+        return res.status(403).json({ message: 'Access denied. You can only update your own non-archived rendezvous.' });
+      }
+  
+      // If the user is a Patient, ensure the rendezvous belongs to the logged-in patient
+      if (req.auth.role === 'Patient' && rendezvous.patient.toString() !== req.auth.userId) {
+        return res.status(403).json({ message: 'Access denied. You can only update your own non-archived rendezvous.' });
+      }
+  
+      // Update the non-archived rendezvous
+      const updatedRendezVous = await RendezVous.findByIdAndUpdate(id, req.body, { new: true });
+      res.status(200).json(updatedRendezVous);
     } catch (error) {
-        res.status(500).json({ error: 'Internal Server Error' });
-        console.error(error);
+      res.status(500).json({ message: 'Error updating non-archived rendezvous', error: error.message });
     }
-}
+  }
+  
 
-
-
-
-// import schedule from "node-schedule";
-// import RendezVous from "../models/rendezvousmodel.js";
-// import auth from "../middlewares/auth.js";
-// import moment from "moment-timezone";
-// import mongoose from "mongoose";
-// import user from "../models/user.js";
-
-// async function addRendezVous(rendezVousDetails, userId, patient) {
-//     console.log(`Rendezvous:  ${rendezVousDetails.title}`);
-
-//     const startDateTime = new Date(rendezVousDetails.startDateTime);
-//     const endDateTime = new Date(startDateTime.getTime() + 30 * 60000); // 30 minutes later
-
-//     const rendezVous = await RendezVous.create({
-//         location: rendezVousDetails.location,
-//         startDateTime: startDateTime,
-//         endDateTime: endDateTime,
-//         timeZone: "Africa/Tunis",
-//         patient: userId,
-//         title: rendezVousDetails.title,
-//         paiement: rendezVousDetails.paiement,
-//         doctorr: patient.doctor.toString(),
-//     });
-
-//     console.log(`Rendezvous added to database: ${rendezVous.location}`);
-
-//     return rendezVous;
-// }
-
-// // /////////////////////////////////
-// export async function addRendezVousToCalendar(req, res) {
-//     try {
-//         const userId = req.auth.userId;
-
-//         const patient = await patient.findOne({ _id: userId });
-
-//         if (!patient) {
-//             return res.status(404).json({
-//                 message: "No patient found for this user.",
-//             });
-//         }
-
-//         const doctorId = String(patient.doctor);
-//         if (!mongoose.Types.ObjectId.isValid(doctorId)) {
-//             return res.status(500).json({
-//                 message: "Invalid doctor ID.",
-//             });
-//         }
-
-//         const doctorid = patient.doctor;
-
-//         const doctor = await doctor.findById(doctorid);
-//         if (!doctor) {
-//             console.log("No doctor found for this rendezvous.");
-//             return res.status(404).json({
-//                 message: "No doctor found for this rendezvous.",
-//             });
-//         }
-
-//         const rendezVousDetails = {
-//             location: doctor.adresse,
-//             doctor: doctorId,
-//             title: req.body.title,
-//             paiement: req.body.paiement,
-//             startDateTime: new Date(req.body.startDateTime),
-//         };
-
-//         const now = new Date();
-
-//         if (rendezVousDetails.startDateTime <= now) {
-//             return res.status(500).json({
-//                 message: "Cannot schedule rendezvous in the past.",
-//             });
-//         }
-
-//         const existingRendezVous = await RendezVous.findOne({
-//             doctor: doctor._id,
-//             startDateTime: rendezVousDetails.startDateTime,
-//         });
-
-//         if (existingRendezVous) {
-//             return res.status(500).json({
-//                 message: "Doctor already has a rendezvous scheduled at this time.",
-//             });
-//         }
-
-//         const rendezVous = await addRendezVous(
-//             req,
-//             rendezVousDetails,
-//             userId,
-//             patient
-//         );
-
-//         const job = schedule.scheduleJob(
-//             rendezVousDetails.startDateTime,
-//             async () => {
-//                 console.log(`Rendezvous scheduled at : ${rendezVousDetails.startDateTime}`);
-//             }
-//         );
-
-//         console.log(`Rendezvous scheduled at : ${rendezVousDetails.startDateTime}`);
-
-//         res.status(201).json({
-//             message: `Rendezvous scheduled at: ${rendezVousDetails.startDateTime}`,
-//         });
-//     } catch (error) {
-//         console.error("Error adding rendezvous:", error);
-
-//         res.status(500).json({
-//             message: "An error occurred while adding the rendezvous.",
-//         });
-//     }
-// }
-
-// /////////////afficher  tout les rdv pour doctor///////////////////
-export async function getDoctorRendezVous(req, res) {
-    const connectUser = req.params._id;
-
+// Controller method to archive a rendezvous by ID (accessible by both Patient and Doctor)
+export async function archiveRendezVousById(req, res) {
+    const { id } = req.params;
     try {
-        const user = await user.findById(connectUser);
-
-        if (!user || user.role !== "doctor") {
-            return res.status(401).json({ message: "Not authorized" });
-        }
-
-        const doctor = await doctor.findOne({ _id: connectUser });
-
-        const rendezVousList = await RendezVous.find({ doctor: doctor }).populate(
-            "patient",
-            "firstname lastname"
-        );
-
-        res.status(200).json({
-            message: `Found ${rendezVousList.length} rendezvous for Doctor ${doctor.lastname}.`,
-            rendezVousList,
-        });
+      const rendezvous = await RendezVous.findById(id);
+      if (!rendezvous) {
+        return res.status(404).json({ message: 'Rendezvous not found' });
+      }
+  
+      // Ensure the logged-in user is either a Patient or a Doctor
+      if (req.auth.role !== 'Patient' && req.auth.role !== 'Doctor') {
+        return res.status(403).json({ message: 'Access denied. You do not have permission to archive this rendezvous.' });
+      }
+  
+      // If the user is a Doctor, ensure the rendezvous belongs to the logged-in doctor
+      if (req.auth.role === 'Doctor' && rendezvous.doctor.toString() !== req.auth.userId) {
+        return res.status(403).json({ message: 'Access denied. You can only archive your own rendezvous.' });
+      }
+  
+      // If the user is a Patient, ensure the rendezvous belongs to the logged-in patient
+      if (req.auth.role === 'Patient' && rendezvous.patient.toString() !== req.auth.userId) {
+        return res.status(403).json({ message: 'Access denied. You can only archive your own rendezvous.' });
+      }
+  
+      // Update the 'archived' field instead of deleting
+      await RendezVous.findByIdAndUpdate(id, { archived: true });
+      res.status(200).json({ message: 'Rendezvous archived successfully' });
     } catch (error) {
-        console.error("Error getting doctor's rendezvous:", error);
-
-        res.status(500).json({
-            message: "An error occurred while getting the doctor's rendezvous.",
-        });
+      res.status(500).json({ message: 'Error archiving rendezvous', error: error.message });
     }
-}
-// /////////////////////////////////////
-// export async function getodayRendezVous(req, res) {
-//     const connectUser = req.auth.userId;
-//     const timezone = "UTC +1";
-//     const now = moment.tz(timezone);
-//     const startOfDay = now.startOf("day").toDate();
-//     const endOfDay = now.endOf("day").toDate();
-//     console.log(startOfDay, endOfDay);
-//     try {
-//         const user = await Doctor.findById(connectUser);
+  }
 
-//         if (!user || user.role !== "doctor") {
-//             return res.status(401).json({ message: "Not authorized" });
-//         }
 
-//         const doctor = await Doctor.findById({ _id: connectUser });
+  // Helper function to get rendezvous by state
+async function getRendezVousByState(req, res, state) {
+    try {
+      // Ensure the logged-in user is either a Patient or a Doctor
+      if (req.auth.role !== 'Patient' && req.auth.role !== 'Doctor') {
+        return res.status(403).json({ message: 'Access denied. You do not have permission to view rendezvous.' });
+      }
+  
+      // If the user is a Doctor, only return rendezvous where the doctor ID matches the logged-in doctor
+      const rendezvousList = await RendezVous.find({
+        doctor: req.auth.userId,
+        state,
+        archived: false,
+      });
+  
+      res.status(200).json(rendezvousList);
+    } catch (error) {
+      res.status(500).json({ message: `Error getting ${state.toLowerCase()} rendezvous`, error: error.message });
+    }
+  }
+  
 
-//         console.log(doctor.lastname);
-//         const rendezVousList = await RendezVous.find({
-//             doctor: doctor,
-//             startDateTime: { $gte: startOfDay, $lte: endOfDay },
-//         }).populate("patient", "firstname lastname");
+  // Controller method to get scheduled rendezvous (accessible by both Patient and Doctor)
+export async function getScheduledRendezVous(req, res) {
+    await getRendezVousByState(req, res, 'Scheduled');
+  }
+  
+  // Controller method to get completed rendezvous (accessible by both Patient and Doctor)
+  export async function getCompletedRendezVous(req, res) {
+    await getRendezVousByState(req, res, 'Completed');
+  }
+  
+  // Controller method to get canceled rendezvous (accessible by both Patient and Doctor)
+  export async function getCanceledRendezVous(req, res) {
+    await getRendezVousByState(req, res, 'Canceled');
+  }
 
-//         res.status(200).json({
-//             message: `Found ${rendezVousList.length} rendezvous today for Doctor ${doctor.lastname}.`,
-//             rendezVousList,
-//         });
-//     } catch (error) {
-//         console.error("Error getting doctor's rendezvous:", error);
 
-//         res.status(500).json({
-//             message: "An error occurred while getting the doctor's rendezvous.",
-//         });
-//     }
-// }
 
-// //////////////////////////redez vous pour patient////////
-// export async function getUpcomingRendezVous(req, res) {
-//     const connectUser = req.auth.userId;
-//     const timezone = "UTC +1";
-//     const now = moment.tz(timezone);
-//     const startOfDay = now.startOf("day").toDate();
-//     const endOfDay = now.endOf("day").toDate();
-//     console.log(startOfDay, endOfDay);
-//     try {
-//         const user = await User.findById(connectUser);
 
-//         if (!user || user.role !== "patient") {
-//             return res.status(401).json({ message: "Not authorized" });
-//         }
-
-//         const patient = await Patient.findOne({ _id: connectUser });
-
-//         console.log(patient.lastname);
-//         const rendezVousList = await RendezVous.find({
-//             patient: patient,
-//             startDateTime: { $gte: startOfDay },
-//             status: "scheduled",
-//         });
-
-//         res.status(200).json({
-//             message: `Found ${rendezVousList.length} upcoming rendezvous for patient ${patient.lastname}.`,
-//             rendezVousList,
-//         });
-//     } catch (error) {
-//         console.error("Error getting patient's upcoming rendezvous:", error);
-
-//         res.status(500).json({
-//             message:
-//                 "An error occurred while getting the patient's upcoming rendezvous.",
-//         });
-//     }
-// }
-// //////////////allrdv pour patient//////////
-
-// export async function getAllRendezVousPatient(req, res) {
-//     const connectUser = req.auth.userId;
-//     try {
-//         const user = await User.findById(connectUser);
-
-//         if (!user || user.role !== "patient") {
-//             return res.status(401).json({ message: "Not authorized" });
-//         }
-
-//         const patient = await Patient.findOne({ _id: connectUser });
-
-//         console.log(patient.lastname);
-//         const rendezVousList = await RendezVous.find({
-//             patient: patient,
-//         }).populate("doctor");
-
-//         res.status(200).json({
-//             message: `Found ${rendezVousList.length} rendezvous for patient ${patient.lastname}.`,
-//             rendezVousList,
-//         });
-//     } catch (error) {
-//         console.error("Error getting patient's rendezvous:", error);
-
-//         res.status(500).json({
-//             message: "An error occurred while getting the patient's rendezvous.",
-//         });
-//     }
-// }
-
-// ///////////////// add doc rdv ////////////////
-// export async function add(req, rendezVousDetail, doctorId) {
-//     try {
-//         const newRendezVous = new RendezVous(rendezVousDetail);
-//         newRendezVous.doctor = doctorId;
-//         await newRendezVous.save();
-//         console.log("Rendezvous added:", newRendezVous);
-//         return newRendezVous;
-//     } catch (error) {
-//         res.status(500).json({
-//             message: "An error occurred while adding the rendezvous.",
-//         });
-//     }
-// }
-// export async function addRendezVousToDoctorCalendar(req, res) {
-//     try {
-//         const doctorId = req.auth.userId;
-
-//         const doctor = await Doctor.findById(doctorId);
-//         if (!doctor) {
-//             console.log("No doctor found.");
-//             return res.status(404).json({
-//                 message: "No doctor found.",
-//             });
-//         }
-
-//         const startDateTime = new Date(req.body.startDateTime);
-//         const endDateTime = new Date(startDateTime.getTime() + 30 * 60000); // 30 minutes later
-
-//         const rendezVousDetail = {
-//             location: doctor.adresse,
-//             doctor: doctorId,
-//             title: req.body.title,
-//             startDateTime,
-//             endDateTime,
-//             timeZone: "Africa/Tunis",
-//         };
-
-//         const now = new Date();
-
-//         if (rendezVousDetail.startDateTime <= now) {
-//             return res.status(500).json({
-//                 message: "Cannot schedule rendezvous in the past.",
-//             });
-//         }
-
-//         const existingRendezVous = await RendezVous.findOne({
-//             doctor: doctorId,
-//             startDateTime: rendezVousDetail.startDateTime,
-//         });
-
-//         if (existingRendezVous) {
-//             return res.status(500).json({
-//                 message: "Doctor already has a rendezvous scheduled at this time.",
-//             });
-//         }
-
-//         const rendezVous = await add(req, rendezVousDetail, doctorId);
-
-//         const job = schedule.scheduleJob(
-//             rendezVousDetail.startDateTime,
-//             async () => {
-//                 console.log(`Rendezvous scheduled at : ${rendezVousDetail.location}`);
-//             }
-//         );
-
-//         console.log(`Rendezvous scheduled at : ${rendezVousDetail.location}`);
-
-//         res.status(201).json({
-//             message: `Rendezvous scheduled at: ${rendezVousDetail.location}`,
-//         });
-//     } catch (error) {
-//         console.error("Error adding rendezvous:", error);
-
-//         res.status(500).json({
-//             message: "An error occurred while adding the rendezvous.",
-//         });
-//     }
-// }
+  
