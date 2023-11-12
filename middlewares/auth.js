@@ -119,3 +119,4 @@ export function authDoctor(req, res, next) {
   }
 }
 
+export default auth;

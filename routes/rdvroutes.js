@@ -1,56 +1,40 @@
 import express from 'express';
-import auth from "../middlewares/auth.js";
+import {
+  createRendezVous,
+  getAllRendezVous,
+  getRendezVousById,
+  updateRendezVousById,
+  archiveRendezVousById,
+  getScheduledRendezVous,
+  getCompletedRendezVous,
+  getCanceledRendezVous,
+} from '../controllers/rendezvouscontroller.js'; // Adjust the path based on your project structure
+import auth from '../middlewares/auth.js'; // Adjust the path based on your project structure
 
 const router = express.Router();
 
+// Create a new rendezvous
+router.post('/', auth, createRendezVous);
 
+// Get all rendezvous (accessible by both Patient and Doctor)
+router.get('/rendezvous', auth, getAllRendezVous);
 
-import { getAllRendezVous,createRendezVous, getRendezVousById, updateRendezVous, deleteRendezVous, addRendezVousToCalendar } from '../controllers/rendezvouscontroller.js';
+// Get a specific rendezvous by ID (accessible by both Patient and Doctor)
+router.get('/rendezvous/:id', auth, getRendezVousById);
 
+// Update a rendezvous by ID (accessible by both Patient and Doctor)
+router.put('/rendezvous/:id', auth, updateRendezVousById);
 
+// Delete a rendezvous by ID (accessible by both Patient and Doctor)
+router.put('/rendezvous/archive/:id', auth, archiveRendezVousById);
 
+// Get all Scheduled rendezvous
+router.get('/rendezvous/scheduled', auth, getScheduledRendezVous);
 
-router
-    .route('/rdvgetAll')
-    .get(getAllRendezVous);
-// Create a new RendezVous
-router
-    .post('/', createRendezVous);
+// Get all completed rendezvous
+router.get('/rendezvous/completed', auth, getCompletedRendezVous);
 
-// Get RendezVous by ID
-router.get('/:id', getRendezVousById);
-
-// Update RendezVous by ID
-router.put('/:id', updateRendezVous);
-
-// Delete RendezVous by ID
-router.delete('/:id', deleteRendezVous);
-
-// add to calendar
-router.route("/calendarAdd").post(auth, addRendezVousToCalendar);
-
-
-
+// Get all canceled rendezvous
+router.get('/rendezvous/canceled', auth, getCanceledRendezVous);
 
 export default router;
-
-
-// import express from "express";
-// import {
-//   addRendezVousToCalendar,
-//   getDoctorRendezVous,
-//   getodayRendezVous,
-//   getUpcomingRendezVous,
-//   getAllRendezVousPatient,
-//   addRendezVousToDoctorCalendar,
-// } from "../controllers/rendezvouscontroller.js";
-// const router = express.Router();
-
-// router.route("/doctor").post(auth, addRendezVousToDoctorCalendar);
-// router.route("/allrdv").get(auth, getAllRendezVousPatient);
-// router.route("/today").get(auth, getodayRendezVous);
-// router.route("/").post(auth, addRendezVousToCalendar);
-// router.route("/:_id").get(getDoctorRendezVous);
-// router.route("/ProchRdv").get(auth, getUpcomingRendezVous);
-
-// export default router;

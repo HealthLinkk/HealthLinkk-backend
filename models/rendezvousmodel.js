@@ -40,6 +40,11 @@ const RendezVousSchema = new Schema({
     type: Boolean,
     default: false
   },
+  State: {
+    type: String, enum: ['Scheduled', 'Completed','Canceled'],
+    default: 'Scheduled'
+  },
+
 });
 
 
