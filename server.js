@@ -3,7 +3,7 @@ import mongoose from 'mongoose'; // Importer Mongoose
 import morgan from 'morgan';
 
 import userRoutes from './routes/user.js';
-
+import cookieParser from 'cookie-parser';
 import pharmacistRoutes from './routes/pharmacist.js';
 import prescriptionRoutes from './routes/prescription.js';
 import pharmacyConfirmationRoutes from './routes/pharmacyConfirmation.js';
