@@ -3,7 +3,10 @@ import mongoose from 'mongoose'; // Importer Mongoose
 import morgan from 'morgan';
 
 import userRoutes from './routes/user.js';
-import rdvroutes from './routes/rdvroutes.js';
+
+import pharmacistRoutes from './routes/pharmacist.js';
+import prescriptionRoutes from './routes/prescription.js';
+import pharmacyConfirmationRoutes from './routes/pharmacyConfirmation.js';
 
 const hostname = '127.0.0.1';
 const app =express();
@@ -33,7 +36,10 @@ app.use(morgan("dev"));
 
 
 app.use('/users',userRoutes);
-app.use('/rdv', rdvroutes);
+
+app.use('/prescription',prescriptionRoutes);
+app.use('/pharmacyConfirmation',pharmacyConfirmationRoutes);
+app.use('/pharmacist',pharmacistRoutes);
 
 
 /**

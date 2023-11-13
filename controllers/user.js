@@ -9,7 +9,9 @@ import upload from '../middlewares/multerConfig.js'
 export async function PatientSignUp(req, res, next) {
       try{
       const hash = await bcrypt.hash(req.body.password, 10);
-      const existingUser = User.findOne({ email:req.body.email });
+      const existingUser = await User.findOne({
+        $or: [{ email: req.body.email }, { numTel: req.body.numTel }],
+      });
 
       if (existingUser) {
           return res.status(400).json({ message: "It seems you already have an account, please log in instead." }); }
@@ -22,7 +24,7 @@ export async function PatientSignUp(req, res, next) {
             numTel : req.body.numTel,
             dateNaiss: req.body.dateNaiss,
             location: req.body.location,
-            role: 'Patient', 
+            role: 'Pharmacist', 
       });
         
           await user.save();

@@ -2,10 +2,6 @@ import express from 'express';
 
 const router = express.Router();
 
-
-
-
-
 import { PatientSignUp , login ,ProfilePicUpload ,DoctorSignUp } from '../controllers/user.js';
  import { auth, authAdminSup ,authDoctor ,authPatient ,authPharmacist } from '../middlewares/auth.js'; 
 

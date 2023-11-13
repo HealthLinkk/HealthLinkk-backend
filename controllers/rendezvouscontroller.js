@@ -108,89 +108,89 @@ export async function deleteRendezVous(req, res, next) {
 // }
 
 // // /////////////////////////////////
-// export async function addRendezVousToCalendar(req, res) {
-//     try {
-//         const userId = req.auth.userId;
+export async function addRendezVousToCalendar(req, res) {
+    try {
+        const userId = req.auth.userId;
 
-//         const patient = await patient.findOne({ _id: userId });
+        const patient = await patient.findOne({ _id: userId });
 
-//         if (!patient) {
-//             return res.status(404).json({
-//                 message: "No patient found for this user.",
-//             });
-//         }
+        if (!patient) {
+            return res.status(404).json({
+                message: "No patient found for this user.",
+            });
+        }
 
-//         const doctorId = String(patient.doctor);
-//         if (!mongoose.Types.ObjectId.isValid(doctorId)) {
-//             return res.status(500).json({
-//                 message: "Invalid doctor ID.",
-//             });
-//         }
+        const doctorId = String(patient.doctor);
+        if (!mongoose.Types.ObjectId.isValid(doctorId)) {
+            return res.status(500).json({
+                message: "Invalid doctor ID.",
+            });
+        }
 
-//         const doctorid = patient.doctor;
+        const doctorid = patient.doctor;
 
-//         const doctor = await doctor.findById(doctorid);
-//         if (!doctor) {
-//             console.log("No doctor found for this rendezvous.");
-//             return res.status(404).json({
-//                 message: "No doctor found for this rendezvous.",
-//             });
-//         }
+        const doctor = await doctor.findById(doctorid);
+        if (!doctor) {
+            console.log("No doctor found for this rendezvous.");
+            return res.status(404).json({
+                message: "No doctor found for this rendezvous.",
+            });
+        }
 
-//         const rendezVousDetails = {
-//             location: doctor.adresse,
-//             doctor: doctorId,
-//             title: req.body.title,
-//             paiement: req.body.paiement,
-//             startDateTime: new Date(req.body.startDateTime),
-//         };
+        const rendezVousDetails = {
+            location: doctor.adresse,
+            doctor: doctorId,
+            title: req.body.title,
+            paiement: req.body.paiement,
+            startDateTime: new Date(req.body.startDateTime),
+        };
 
-//         const now = new Date();
+        const now = new Date();
 
-//         if (rendezVousDetails.startDateTime <= now) {
-//             return res.status(500).json({
-//                 message: "Cannot schedule rendezvous in the past.",
-//             });
-//         }
+        if (rendezVousDetails.startDateTime <= now) {
+            return res.status(500).json({
+                message: "Cannot schedule rendezvous in the past.",
+            });
+        }
 
-//         const existingRendezVous = await RendezVous.findOne({
-//             doctor: doctor._id,
-//             startDateTime: rendezVousDetails.startDateTime,
-//         });
+        const existingRendezVous = await RendezVous.findOne({
+            doctor: doctor._id,
+            startDateTime: rendezVousDetails.startDateTime,
+        });
 
-//         if (existingRendezVous) {
-//             return res.status(500).json({
-//                 message: "Doctor already has a rendezvous scheduled at this time.",
-//             });
-//         }
+        if (existingRendezVous) {
+            return res.status(500).json({
+                message: "Doctor already has a rendezvous scheduled at this time.",
+            });
+        }
 
-//         const rendezVous = await addRendezVous(
-//             req,
-//             rendezVousDetails,
-//             userId,
-//             patient
-//         );
+        const rendezVous = await addRendezVous(
+            req,
+            rendezVousDetails,
+            userId,
+            patient
+        );
 
-//         const job = schedule.scheduleJob(
-//             rendezVousDetails.startDateTime,
-//             async () => {
-//                 console.log(`Rendezvous scheduled at : ${rendezVousDetails.startDateTime}`);
-//             }
-//         );
+        const job = schedule.scheduleJob(
+            rendezVousDetails.startDateTime,
+            async () => {
+                console.log(`Rendezvous scheduled at : ${rendezVousDetails.startDateTime}`);
+            }
+        );
 
-//         console.log(`Rendezvous scheduled at : ${rendezVousDetails.startDateTime}`);
+        console.log(`Rendezvous scheduled at : ${rendezVousDetails.startDateTime}`);
 
-//         res.status(201).json({
-//             message: `Rendezvous scheduled at: ${rendezVousDetails.startDateTime}`,
-//         });
-//     } catch (error) {
-//         console.error("Error adding rendezvous:", error);
+        res.status(201).json({
+            message: `Rendezvous scheduled at: ${rendezVousDetails.startDateTime}`,
+        });
+    } catch (error) {
+        console.error("Error adding rendezvous:", error);
 
-//         res.status(500).json({
-//             message: "An error occurred while adding the rendezvous.",
-//         });
-//     }
-// }
+        res.status(500).json({
+            message: "An error occurred while adding the rendezvous.",
+        });
+    }
+}
 
 // /////////////afficher  tout les rdv pour doctor///////////////////
 export async function getDoctorRendezVous(req, res) {

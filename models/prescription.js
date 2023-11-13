@@ -1,15 +1,16 @@
-import mongoose from "mongoose"
+import mongoose from 'mongoose'
 const {Schema,model} = mongoose
 const prescriptionSchema = new mongoose.Schema({
-    doctor: {type: mongoose.Schema.Types.ObjectId, ref: 'user'},
-    patient: {type: mongoose.Schema.Types.ObjectId, ref: 'user'},
-    prescriptedDrugs: [
+    doctor: {type: String, ref: 'user'},
+    patient: {type: String, ref: 'user'},
+    prescribedDrugs: [
         {
-            drug: { type: mongoose.Schema.ObjectId, ref: 'Drug'},
-            dosage :{ type: String,required : true} 
+            drug: { type: String,required : false},
+            dosage :{ type: String,required : false} 
         }
     ]
 });
+
 const Prescription = mongoose.model('Prescription',prescriptionSchema);
 
 export default model("prescription",prescriptionSchema);
