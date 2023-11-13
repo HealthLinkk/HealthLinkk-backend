@@ -3,7 +3,10 @@ import mongoose from 'mongoose'; // Importer Mongoose
 import morgan from 'morgan';
 
 import userRoutes from './routes/user.js';
-import rdvroutes from './routes/rdvroutes.js';
+
+import pharmacistRoutes from './routes/pharmacist.js';
+import prescriptionRoutes from './routes/prescription.js';
+import pharmacyConfirmationRoutes from './routes/pharmacyConfirmation.js';
 import videoroutes from'./routes/videoroutes.js';
 import paymentroutes from './routes/paymentroutes.js'
 import { sendSMS } from './utils/smsSender.js';
@@ -42,7 +45,10 @@ app.get("/logout", (req, res) => {
   res.status(201).json({ message: 'successfully logged out ' })
 })
 
-app.use('/rdv', rdvroutes);
+
+app.use('/prescription',prescriptionRoutes);
+app.use('/pharmacyConfirmation',pharmacyConfirmationRoutes);
+app.use('/pharmacist',pharmacistRoutes);
 app.use('/api/video', videoroutes);
 app.use('/api/payment', paymentroutes);
 

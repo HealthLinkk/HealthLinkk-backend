@@ -1,4 +1,4 @@
-import mongoose from "mongoose"
+import mongoose from 'mongoose'
 const {Schema,model} = mongoose
 const pharmacyConfirmationSchema = new mongoose.Schema({
     pharmacy: {type: mongoose.Schema.Types.ObjectId,ref: 'Pharmacy'},
