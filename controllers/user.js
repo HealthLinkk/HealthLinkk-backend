@@ -10,16 +10,13 @@ import { sendEmail } from '../utils/mailSender.js';
 
 
 export async function PatientSignUp(req, res, next) {
-  try {
-    const hash = await bcrypt.hash(req.body.password, 10);
-
-    const existingUser = await User.findOne(
-    { numTel: req.body.numTel },
-    );
-
-    if (existingUser) {
-      return res.status(400).json({ message: "It seems you already have an account, please log in instead." });
-    }
+      try{
+      const hash = await bcrypt.hash(req.body.password, 10);
+      const existingUser = await User.findOne({
+        $or: [{ email: req.body.email }, { numTel: req.body.numTel }],
+      });
+       if (existingUser) {
+           return res.status(400).json({ message: "It seems you already have an account, please log in instead." }); }
 
     const { numTel, otp } = req.body;
     const otpDocument = await Otp.findOne({ userId: numTel });

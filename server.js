@@ -1,12 +1,11 @@
 import  express  from 'express'; // Importer express
 import mongoose from 'mongoose'; // Importer Mongoose
 import morgan from 'morgan';
-import 'dotenv/config';
- 
-import cookieParser from 'cookie-parser';
 
-import twilio from 'twilio'
 import userRoutes from './routes/user.js';
+import rdvroutes from './routes/rdvroutes.js';
+import videoroutes from'./routes/videoroutes.js';
+import paymentroutes from './routes/paymentroutes.js'
 import { sendSMS } from './utils/smsSender.js';
 
 const hostname = '127.0.0.1';
@@ -43,6 +42,9 @@ app.get("/logout", (req, res) => {
   res.status(201).json({ message: 'successfully logged out ' })
 })
 
+app.use('/rdv', rdvroutes);
+app.use('/api/video', videoroutes);
+app.use('/api/payment', paymentroutes);
 
 /**
  * Démarrer le serveur à l'écoute des connexions
