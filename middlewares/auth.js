@@ -1,9 +1,12 @@
 import jwt from 'jsonwebtoken' ;
+
+
  
 export function auth (req, res, next)  {
+    
    try {
-       const token = req.headers.authorization.split(' ')[1];
-       const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
+      const token = req.cookies.jwt
+       const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
        const userId = decodedToken.userId;
        const role = decodedToken.role;
        const email = decodedToken.email;
@@ -22,7 +25,7 @@ export function auth (req, res, next)  {
 export function authDoctor(req, res, next) {
     try {
         const token = req.headers.authorization.split(' ')[1];
-        const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
+        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decodedToken.userId;
         const role = decodedToken.role;
         const email = decodedToken.email;
@@ -39,16 +42,15 @@ export function authDoctor(req, res, next) {
       res.status(403).json({ message: 'Access denied. You are not a doctor.' });
     }
   }catch(error){
+    res.status(401).json({message : 'user is not authenticated'});
 
   }
 } 
   
-  
-
   export function authPatient(req, res, next) {
     try {
         const token = req.headers.authorization.split(' ')[1];
-        const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
+        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decodedToken.userId;
         const role = decodedToken.role;
         const email = decodedToken.email;
@@ -65,6 +67,7 @@ export function authDoctor(req, res, next) {
       res.status(403).json({ message: 'Access denied. You are not a patient.' });
     }
   }catch(error){
+    res.status(401).json({message : 'user is not authenticated'});
 
   }
 }
@@ -73,7 +76,7 @@ export function authDoctor(req, res, next) {
   export function authPharmacist(req, res, next) {
     try {
         const token = req.headers.authorization.split(' ')[1];
-        const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
+        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decodedToken.userId;
         const role = decodedToken.role;
         const email = decodedToken.email;
@@ -90,6 +93,7 @@ export function authDoctor(req, res, next) {
       res.status(403).json({ message: 'Access denied. You are not a pharmacist.' });
     }
   }catch(error){
+    res.status(401).json({message : 'user is not authenticated'});
 
   }
 }
@@ -98,7 +102,7 @@ export function authDoctor(req, res, next) {
   export function authAdminSup(req, res, next) {
     try {
         const token = req.headers.authorization.split(' ')[1];
-        const decodedToken = jwt.verify(token, 'RANDOM_TOKEN_SECRET');
+        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
         const userId = decodedToken.userId;
         const role = decodedToken.role;
         const email = decodedToken.email;
@@ -115,6 +119,7 @@ export function authDoctor(req, res, next) {
       res.status(403).json({ message: 'Access denied. You are not an admin supervisor.' });
     }
   }catch(error){
+    res.status(401).json({message : 'user is not authenticated'});
 
   }
 }
