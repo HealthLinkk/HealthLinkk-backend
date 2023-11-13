@@ -3,7 +3,7 @@ const { Schema, model } = mongoose; // Utiliser Schema et model du module mongoo
 const userSchema = new mongoose.Schema({
     name: { type: String, required: true },
     lastName : { type: String, required: true },
-    email: { type: String, required: false, unique: true },
+    email: { type: String, required: false },
     password: { type: String, required: true },
     numTel: { type: Number, required: true ,unique:true },
     location: { type: String, required: true },

@@ -12,8 +12,7 @@ import { sendEmail } from '../utils/mailSender.js';
 export async function PatientSignUp(req, res, next) {
       try{
       const hash = await bcrypt.hash(req.body.password, 10);
-      const existingUser = await User.findOne({
-        $or: [{ email: req.body.email }, { numTel: req.body.numTel }],
+      const existingUser = await User.findOne({ numTel: req.body.numTel ,
       });
        if (existingUser) {
            return res.status(400).json({ message: "It seems you already have an account, please log in instead." }); }
@@ -124,7 +123,7 @@ export async function DoctorSignUp(req,res,next){
   
 
 export function login(req, res, next) {
-  User.findOne({ email: req.body.email })
+  User.findOne({ numTel: req.body.numTel })
       .then(user => {
           if (!user) {
               return res.status(401).json({ message: 'User is not registered' });
@@ -137,8 +136,8 @@ export function login(req, res, next) {
                   } else {
                       const maxAge = 1 * 60 * 60;
                       const token = jwt.sign(
-                          { userId: user._id, email: user.email, role: user.role, numTel: user.numTel },
-                          process.env.JWT_SECRET,
+                          { userId: user._id, role: user.role, numTel: user.numTel },
+                          "" + process.env.JWT_SECRET,
                           { expiresIn: maxAge } // 1hr in sec
                       );
                       res.cookie("jwt", token, {
