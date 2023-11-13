@@ -1,47 +1,56 @@
 import Patient from '../models/patient.js' ;
 import Doctor from '../models/doctor.js' ;
-import mongoose from 'mongoose';
 import User from '../models/user.js' ;
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import upload from '../middlewares/multerConfig.js'
 import otpGenerator from 'otp-generator';
-
-import twilio from 'twilio';
 import Otp from '../models/otp.js';
 import { sendEmail } from '../utils/mailSender.js';
-
 
 
 export async function PatientSignUp(req, res, next) {
   try {
     const hash = await bcrypt.hash(req.body.password, 10);
 
-    const existingUser = await User.findOne({
-      $or: [{ email: req.body.email }, { numTel: req.body.numTel }],
-    });
+    const existingUser = await User.findOne(
+    { numTel: req.body.numTel },
+    );
 
     if (existingUser) {
       return res.status(400).json({ message: "It seems you already have an account, please log in instead." });
     }
-    const user = new Patient({
-      name: req.body.name,
-      lastName: req.body.lastName,
-      email: req.body.email,
-      password: hash,
-      numTel: req.body.numTel,
-      dateNaiss: req.body.dateNaiss,
-      location: req.body.location,
-      role: 'Patient',
-    });
 
-    await user.save();
-    return res.status(201).json({ message: 'Patient created!' });
+    const { numTel, otp } = req.body;
+    const otpDocument = await Otp.findOne({ userId: numTel });
+
+    if (!otpDocument) {
+      return res.status(404).json({ error: 'OTP not found' });
+    }
+    // Verify the OTP
+    if (otp === otpDocument.otp) {
+      // Delete the OTP document
+      await otpDocument.deleteOne();
+      const user = new Patient({
+        name: req.body.name,
+        lastName: req.body.lastName,
+        password: hash,
+        numTel: req.body.numTel,
+        dateNaiss: req.body.dateNaiss,
+        location: req.body.location,
+        role: 'Patient',
+      });
+  
+      await user.save();
+
+      return res.status(200).json({ message: 'OTP verified and Patient created' });
+    } else {
+      return res.status(401).json({ error: 'Invalid OTP' });
+    }
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
 }
-
 
 export  async function ProfilePicUpload (req,res,next){
     upload.single('picture')(req, res,async (err) => {
@@ -72,24 +81,47 @@ export  async function ProfilePicUpload (req,res,next){
     
   };
 
-export function DoctorSignUp(req,res,next){
-  bcrypt.hash(req.body.password, 10)
-  .then((hash) => {
-    const user = new Doctor({
-      name: req.body.name,
-      lastName: req.body.lastName,
-      email: req.body.email,
-      password: hash,
-      numTel : req.body.numTel,
-      location: req.body.location,
-      role: 'Doctor', 
-    });
+export async function DoctorSignUp(req,res,next){
+  try {
+    const hash = await bcrypt.hash(req.body.password, 10);
 
-    user.save()
-      .then(() => res.status(201).json({ message: 'Doctor created!' }))
-      .catch((error) => res.status(400).json({ error }));
-  })
-  .catch((error) => res.status(500).json({ error }));
+    const existingUser = await User.findOne(
+    { numTel: req.body.numTel },
+    );
+
+    if (existingUser) {
+      return res.status(400).json({ message: "It seems you already have an account, please log in instead." });
+    }
+
+    const { numTel, otp } = req.body;
+    const otpDocument = await Otp.findOne({ userId: numTel });
+
+    if (!otpDocument) {
+      return res.status(404).json({ error: 'OTP not found' });
+    }
+    // Verify the OTP
+    if (otp === otpDocument.otp) {
+      // Delete the OTP document
+      await otpDocument.deleteOne();
+      const user = new Doctor({
+        name: req.body.name,
+        lastName: req.body.lastName,
+        password: hash,
+        numTel: req.body.numTel,
+        dateNaiss: req.body.dateNaiss,
+        location: req.body.location,
+        role: 'Doctor',
+      });
+  
+      await user.save();
+
+      return res.status(200).json({ message: 'OTP verified and Doctor created' });
+    } else {
+      return res.status(401).json({ error: 'Invalid OTP' });
+    }
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
 
 };
   
@@ -136,52 +168,36 @@ export function login(req, res, next) {
 }
 
 
-// export function sendOTP(req,res,next){
-//   try {
-    
-//     const client = twilio(process.env.ACCOUNT_SID,process.env.AUTH_TOKEN);
-//     const otp = otpGenerator.generate({
-//         secret: process.env.JWT_SECRET,
-//         digits: 6,
-//         algorithm: 'sha256',
-//         epoch: Date.now(),
-//     });
+export async function sendOTP(req,res,next){
+  try {
+    const existingUser = await User.findOne(
+      { numTel: req.body.numTel },
+    );
 
-//     const phoneNumber = req.body.numTel; // Get the phone number from the request body
+    if (existingUser) {
+      return res.status(400).json({ message: "It seems you already have an account, please log in instead." });
+    }
+    const otp = otpGenerator.generate(6,{
+      secret: process.env.JWT_SECRET,
+      digits: 6,
+      algorithm: 'sha256',
+      epoch: Date.now(),
+      upperCaseAlphabets: false, specialChars: false,
+      lowerCaseAlphabets: false,
+  });
+        const otpDocument = new Otp({
+            userId: req.body.numTel, 
+            otp
+        });
 
-//     // // Validate phone number (you may need a more robust validation)
-//     // if (!isValidPhoneNumber(phoneNumber)) {
-//     //     return res.status(400).json({ error: 'Invalid phone number' });
-//     // }
+        await otpDocument.save();
+        res.status(200).json({ otp : otpDocument });
 
-//     // Send SMS using Twilio
-//     client.messages.create({
-//         body: `Your OTP is: ${otp}`,
-//         to: phoneNumber,
-//         from: '21690026242' 
-//     })
-//     .then(async (message) => {
-//         console.log(`OTP sent to ${phoneNumber}`);
-
-//         // Save the OTP document only if the phone number is valid
-//         const otpDocument = new Otp({
-//             userId: req.body.email, // Assuming email is used as a unique identifier
-//             otp,
-//         });
-
-//         await otpDocument.save();
-
-//         res.status(200).json({ message: 'OTP sent successfully' });
-//     })
-//     .catch(error => {
-//         console.error('Error sending OTP:', error);
-//         res.status(500).json({ error: 'Failed to send OTP' });
-//     });
-// } catch (error) {
-//     console.error('Error generating OTP:', error);
-//     res.status(500).json({ error: 'Internal Server Error' });
-// }
-// }
+} catch (error) {
+    console.error('Error generating OTP:', error);
+    res.status(500).json({ error: 'Internal Server Error' });
+}
+}
 
 
 export async function forgetPasssword(req,res,next){
@@ -261,7 +277,6 @@ export async function resetPassword(req,res,next){
 }
 
 
-
 export async function ProfileEdit(req, res, next) {
   try {
     const authenticatedId = req.auth.userId;
@@ -326,7 +341,6 @@ sendEmail(req.body.email,'Welcome to HealthLink',pwd)
     return res.status(500).json({ error: error.message });
   }
 }
-
 
 function generatePassword() { 
     var length = 8, 

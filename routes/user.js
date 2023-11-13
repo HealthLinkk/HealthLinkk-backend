@@ -6,7 +6,7 @@ const router = express.Router();
 
 
 
-import { PatientSignUp , login ,ProfilePicUpload ,DoctorSignUp, getAllUsers, ProfileEdit, AddPharmacy,  forgetPasssword, verifyOtp, resetPassword } from '../controllers/user.js';
+import { PatientSignUp , login ,ProfilePicUpload ,DoctorSignUp, getAllUsers, ProfileEdit, AddPharmacy,  forgetPasssword, verifyOtp, resetPassword,sendOTP } from '../controllers/user.js';
  import { auth, authAdminSup ,authDoctor ,authPatient ,authPharmacist } from '../middlewares/auth.js'; 
 
 
@@ -15,9 +15,9 @@ router
   .route('/PatientSignup')
   .post(PatientSignUp);
 
-// router
-//   .route('/sendOTP')
-//   .post(sendOTP)
+router
+  .route('/sendOTP')
+  .post(sendOTP)
 
 router
   .route('/forgetPassword')
