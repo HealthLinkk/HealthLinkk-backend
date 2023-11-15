@@ -1,6 +1,9 @@
 import  express  from 'express'; // Importer express
 import mongoose from 'mongoose'; // Importer Mongoose
 import morgan from 'morgan';
+import commentRoutes from './routes/comment.js';
+import LikeDislikeRoutes from './routes/LikeDislike.js';
+import postRoutes from './routes/post.js';
 
 import userRoutes from './routes/user.js';
 
@@ -32,6 +35,10 @@ app.use(morgan("dev"));
 
 
 app.use('/users',userRoutes);
+
+app.use('/post',postRoutes);
+app.use('/comment',commentRoutes);
+app.use('/LikeDislike',LikeDislikeRoutes);
 
 
 /**
