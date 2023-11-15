@@ -1,4 +1,8 @@
 import RendezVous from '../models/rendezvousmodel.js';
+import Doctor from '../models/doctor.js';
+import { findByRole } from './pharmacist.js';
+import User from '../models/user.js'
+
 
 // Controller method to create a new rendezvous (accessible by both Patient and Doctor)
 export async function createRendezVous(req, res) {
@@ -210,6 +214,43 @@ export async function getScheduledRendezVous(req, res) {
     await getRendezVousByState(req, res, 'Canceled');
   }
 
+
+
+
+// Controller method to get a specific doctor by ID
+
+export async function findByRoleAndId(role, userId) {
+  try {
+    const user = await User.findOne({ _id: userId, role: role }).exec();
+    return user;
+  } catch (error) {
+    throw new Error(`Error finding user with ID ${userId} and role ${role}: ${error.message}`);
+  }
+}
+
+
+export async function getAllDoctors (req, res) {
+  try {
+      const doctors = await findByRole("Doctor",);
+      res.status(200).json(doctors);
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
+};
+export async function getDoctorById(req,res){
+  const doctorId = req.params.id;
+  const role = "Doctor";
+  try {
+    const doctor = await findByRoleAndId(role, doctorId);
+    if (doctor) {
+      res.status(200).json(doctor);
+    } else {
+      res.status(404).json({ error: 'Doctor not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ error: `Error retrieving doctor: ${error.message}` });
+  }
+}
 
 
 

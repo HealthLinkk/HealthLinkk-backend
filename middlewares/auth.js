@@ -5,8 +5,8 @@ import jwt from 'jsonwebtoken' ;
 export function auth (req, res, next)  {
     
    try {
-      const token = req.cookies.jwt
-       const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+    const token = req.headers.authorization.split(' ')[1];    
+       const decodedToken = jwt.verify(token, ""+process.env.JWT_SECRET);
        const userId = decodedToken.userId;
        const role = decodedToken.role;
        const email = decodedToken.email;

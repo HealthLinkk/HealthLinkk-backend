@@ -8,6 +8,8 @@ import {
   getScheduledRendezVous,
   getCompletedRendezVous,
   getCanceledRendezVous,
+  getDoctorById,
+  getAllDoctors
 } from '../controllers/rendezvouscontroller.js'; // Adjust the path based on your project structure
 import auth from '../middlewares/auth.js'; // Adjust the path based on your project structure
 
@@ -36,5 +38,12 @@ router.get('/rendezvous/completed', auth, getCompletedRendezVous);
 
 // Get all canceled rendezvous
 router.get('/rendezvous/canceled', auth, getCanceledRendezVous);
+
+// Get Doctor By Id
+router.get('/GetDoctorById/:id', auth, getDoctorById);
+
+router.get('/Doctors',getAllDoctors);
+router.get('/Doctor/:id',getDoctorById)
+
 
 export default router;

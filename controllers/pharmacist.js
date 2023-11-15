@@ -1,6 +1,6 @@
 import user from '../models/user.js';
 
-async function findByRole(role) {
+export async function findByRole(role) {
   try {
       const users = await user.find({ role: role }).exec();
       return users;
@@ -8,6 +8,15 @@ async function findByRole(role) {
       throw new Error(`Error finding users with role ${role}: ${error.message}`);
   }
 }
+export async function findByRoleAndId(role, userId) {
+  try {
+    const user = await user.findOne({ _id: userId, role: role }).exec();
+    return user;
+  } catch (error) {
+    throw new Error(`Error finding user with ID ${userId} and role ${role}: ${error.message}`);
+  }
+}
+
 export async function getAllPharmacies (req, res) {
     try {
         const pharmacies = await findByRole("Pharmacist",);

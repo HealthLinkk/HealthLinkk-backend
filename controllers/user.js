@@ -33,7 +33,6 @@ export async function PatientSignUp(req, res, next) {
         password: hash,
         numTel: req.body.numTel,
         dateNaiss: req.body.dateNaiss,
-        location: req.body.location,
         role: 'Patient',
       });
   

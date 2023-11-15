@@ -2,6 +2,7 @@ import  express  from 'express'; // Importer express
 import mongoose from 'mongoose'; // Importer Mongoose
 import morgan from 'morgan';
 
+import rdvroutes from './routes/rdvroutes.js'
 import userRoutes from './routes/user.js';
 import cookieParser from 'cookie-parser';
 import pharmacistRoutes from './routes/pharmacist.js';
@@ -10,6 +11,7 @@ import pharmacyConfirmationRoutes from './routes/pharmacyConfirmation.js';
 import videoroutes from'./routes/videoroutes.js';
 import paymentroutes from './routes/paymentroutes.js'
 import { sendSMS } from './utils/smsSender.js';
+import cors from 'cors'
 
 const hostname = '127.0.0.1';
 const app =express();
@@ -33,7 +35,7 @@ mongoose
     console.log(err);
   });
 
-
+  app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
 app.use(cookieParser());
@@ -45,7 +47,7 @@ app.get("/logout", (req, res) => {
   res.status(201).json({ message: 'successfully logged out ' })
 })
 
-
+app.use('/rdv',rdvroutes);
 app.use('/prescription',prescriptionRoutes);
 app.use('/pharmacyConfirmation',pharmacyConfirmationRoutes);
 app.use('/pharmacist',pharmacistRoutes);
