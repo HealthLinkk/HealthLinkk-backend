@@ -1,37 +1,26 @@
-// controllers/allergyController.js
 import Allergy from '../models/allergys.js';
-import request from 'request';
-import cheerio from 'cheerio';
+import fs from 'fs';
+import path from 'path';
 
 // Middleware de scraping
 export function scrapeAllergies(req, res, next) {
   try {
-    // URL de la source fictive des allergies (à remplacer par une source réelle)
-    const sourceUrl = 'https://fr.wikipedia.org/wiki/Liste_des_principaux_allerg%C3%A8nes';
+    // Chemin vers le fichier JSON contenant les données d'allergies
+    const filePath = 'C:\\Users\\Aziz Bouharb\\Desktop\\scraped_data.json';
 
-    request(sourceUrl, (error, response, body) => {
-      if (!error && response.statusCode === 200) {
-        const $ = cheerio.load(body);
+    // Lisez le contenu du fichier JSON
+    const rawData = fs.readFileSync(filePath);
+    const allergiesData = JSON.parse(rawData);
 
-        // Sélectionnez les éléments HTML contenant les noms d'allergies
-        const allergyElements = $('ul.allergies-list li');
+    // Parcourez les données et enregistrez les noms dans la base de données
+    allergiesData.forEach(async (allergyName) => {
+      const allergy = new Allergy({ name: allergyName });
 
-        // Parcourez les éléments et enregistrez les noms dans la base de données
-        allergyElements.each(async (index, element) => {
-          const allergyName = $(element).text();
-          const allergy = new Allergy({ name: allergyName });
-
-          await allergy.save();
-        });
-
-        res.status(200).json({ message: 'Noms d\'allergies scrapés et stockés avec succès' });
-      } else {
-        next(new Error('Impossible de récupérer la source des allergies'));
-      }
+      await allergy.save();
     });
+
+    res.status(200).json({ message: 'Noms d\'allergies lus depuis le fichier JSON et stockés avec succès' });
   } catch (error) {
     next(error);
   }
 }
-
-

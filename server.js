@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import userRoutes from './routes/user.js';
 import medicalRecordRoutes from './routes/medicalRecord.js';
 import allergyRoutes from './routes/allergyRoutes.js';
+import medicationRoutes from './routes/medicationRoutes.js';
 
 
 const hostname = '127.0.0.1';
@@ -37,6 +38,7 @@ app.use(morgan("dev"));
 app.use('/users',userRoutes);
 app.use('/medicalRecord',medicalRecordRoutes);
 app.use('/allergies', allergyRoutes);
+app.use('/medication', medicationRoutes);
 
 /**
  * Démarrer le serveur à l'écoute des connexions
