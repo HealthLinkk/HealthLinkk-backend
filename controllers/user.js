@@ -145,10 +145,7 @@ export function login(req, res, next) {
                           Secure: true,
                       });
 
-                      res.status(200).json({
-                          userId: user._id,
-                          message: "User successfully Logged in",
-                      });
+                      res.status(200).json(user);
                   }
               })
               .catch(error => {
