@@ -12,7 +12,7 @@ import { PatientSignUp , login ,ProfilePicUpload ,DoctorSignUp, getAllUsers, Pro
 
 
 router
-  .route('/PatientSignup')
+  .route('/PatientSignUp')
   .post(PatientSignUp);
 
 router
