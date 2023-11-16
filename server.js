@@ -1,6 +1,9 @@
 import  express  from 'express'; // Importer express
 import mongoose from 'mongoose'; // Importer Mongoose
 import morgan from 'morgan';
+import commentRoutes from './routes/comment.js';
+import LikeDislikeRoutes from './routes/LikeDislike.js';
+import postRoutes from './routes/post.js';
 
 import rdvroutes from './routes/rdvroutes.js'
 import userRoutes from './routes/user.js';
@@ -53,6 +56,10 @@ app.use('/pharmacyConfirmation',pharmacyConfirmationRoutes);
 app.use('/pharmacist',pharmacistRoutes);
 app.use('/api/video', videoroutes);
 app.use('/api/payment', paymentroutes);
+app.use('/post',postRoutes);
+app.use('/comment',commentRoutes);
+app.use('/LikeDislike',LikeDislikeRoutes);
+
 
 /**
  * Démarrer le serveur à l'écoute des connexions
