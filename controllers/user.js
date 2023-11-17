@@ -162,6 +162,10 @@ export function login(req, res, next) {
 
 export async function sendOTP(req,res,next){
   try {
+    const numTelRegex = /^\d{8}$/;
+    if (!numTelRegex.test(req.body.numTel)) {
+      return res.status(400).json({ message: "Invalid numTel format. Please enter 8 digits." });
+    }
     const existingUser = await User.findOne(
       { numTel: req.body.numTel },
     );
@@ -183,7 +187,7 @@ export async function sendOTP(req,res,next){
         });
 
         await otpDocument.save();
-        res.status(200).json({ otp : otpDocument });
+        res.status(200).json({ message: "OTP Sent"});
 
 } catch (error) {
     console.error('Error generating OTP:', error);
