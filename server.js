@@ -4,6 +4,7 @@ import morgan from 'morgan';
 import commentRoutes from './routes/comment.js';
 import LikeDislikeRoutes from './routes/LikeDislike.js';
 import postRoutes from './routes/post.js';
+import connectToDatabase from './database.js';
 
 import rdvroutes from './routes/rdvroutes.js'
 import userRoutes from './routes/user.js';
@@ -27,17 +28,18 @@ mongoose.set('debug', true);
 mongoose.Promise = global.Promise;
 
 // Se connecter à MongoDB
-mongoose
-  .connect(`mongodb://127.0.0.1:27017/${databaseName}`)
-  .then(() => {
-    // Une fois connecté, afficher un message de réussite sur la console
-    console.log(`Connected to ${databaseName}`);
-  })
-  .catch(err => {
-    // Si quelque chose ne va pas, afficher l'erreur sur la console
-    console.log(err);
-  });
+// mongoose
+//   .connect(`mongodb://127.0.0.1:27017/${databaseName}`)
+//   .then(() => {
+//     // Une fois connecté, afficher un message de réussite sur la console
+//     console.log(`Connected to ${databaseName}`);
+//   })
+//   .catch(err => {
+//     // Si quelque chose ne va pas, afficher l'erreur sur la console
+//     console.log(err);
+//   });
 
+  connectToDatabase()
   app.use(cors());
 app.use(express.json());
 app.use(morgan("dev"));
