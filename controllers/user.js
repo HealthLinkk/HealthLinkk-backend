@@ -1,6 +1,7 @@
 import Patient from '../models/patient.js' ;
 import Doctor from '../models/doctor.js' ;
 import User from '../models/user.js' ;
+import Specialty from '../models/specialty.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import upload from '../middlewares/multerConfig.js'
@@ -98,9 +99,11 @@ export async function DoctorSignUp(req,res,next){
     if (otp === otpDocument.otp) {
       // Delete the OTP document
       await otpDocument.deleteOne();
+      const { specialization } = req.body;
       const user = new Doctor({
         name: req.body.name,
         lastName: req.body.lastName,
+        Email: req.body.Email,
         password: hash,
         numTel: req.body.numTel,
         dateNaiss: req.body.dateNaiss,
@@ -120,7 +123,32 @@ export async function DoctorSignUp(req,res,next){
 
 };
   
+export async function DoctorInfos(req, res, next) {
+  try {
+    const doctorId = req.body.id; // Assuming you have the doctor's ID from the authenticated user
+    const { numTel,specialization, verificationDocument } = req.body;
 
+    const doctor = await Doctor.findOne({numTel});
+
+    if (!doctor) {
+      return res.status(404).json({ error: 'Doctor not found' });
+    }
+
+    // Update the diplomaVerification information
+    doctor.diplomaVerification = {
+      isVerified: false, // You may want to set this to true based on your verification process
+      verificationDocument: verificationDocument,
+      specialization: specialization,
+    };
+
+    await doctor.save();
+
+    return res.status(200).json({ message: 'DiplomaVerification information updated successfully' });
+  } catch (error) {
+    console.error('Error updating DiplomaVerification information:', error);
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+}
 export function login(req, res, next) {
   User.findOne({ numTel: req.body.numTel })
       .then(user => {
@@ -336,6 +364,15 @@ sendEmail(req.body.email,'Welcome to HealthLink',pwd)
   } catch (error) {
     return res.status(500).json({ error: error.message });
   }
+}
+export async function getAllSpecialities(req,res,next){
+  try {
+    const specialties = await Specialty.find();
+    res.status(200).json(specialties);
+} catch (error) {
+    res.status(500).json({ error: error.message });
+}
+
 }
 
 function generatePassword() { 
