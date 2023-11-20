@@ -5,9 +5,7 @@ import Post from "../models/post.js";
   export async function getAllPosts(req, res) {
     const posts = await Post.find();
 
-    res.status(200).json({
-      posts,
-    });
+    res.status(200).json(posts);
   }
 
   // **Display a specific post by its ID**

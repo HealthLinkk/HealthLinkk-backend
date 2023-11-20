@@ -5,19 +5,19 @@ import { getAllPosts , getPostById , createPost , updatePostById ,deletePostById
 import { auth } from "../middlewares/auth.js";
 
 // Display all posts
-router.get("/posts", getAllPosts,auth);
+router.get("/Aposts", getAllPosts,auth);
 
 
 // Display a specific post by its ID
-router.get("/posts/:id", getPostById);
+router.get("/Iposts/:id", getPostById);
 
 // // Add a new post
-router.post("/posts",auth, createPost);
+router.post("/Cposts",auth, createPost);
 
 // Modify an existing post by its ID
-router.put("/posts/:id", updatePostById);
+router.put("/Uposts/:id", updatePostById);
 
 // Delete an existing post by its ID
-router.delete("/posts/:id", deletePostById);
+router.delete("/Dposts/:id", deletePostById);
 
 export default router;
