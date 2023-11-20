@@ -25,7 +25,7 @@ export function auth (req, res, next)  {
 export function authDoctor(req, res, next) {
     try {
         const token = req.headers.authorization.split(' ')[1];
-        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        const decodedToken = jwt.verify(token, ""+process.env.JWT_SECRET);
         const userId = decodedToken.userId;
         const role = decodedToken.role;
         const email = decodedToken.email;
@@ -50,7 +50,7 @@ export function authDoctor(req, res, next) {
   export function authPatient(req, res, next) {
     try {
         const token = req.headers.authorization.split(' ')[1];
-        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        const decodedToken = jwt.verify(token, ""+process.env.JWT_SECRET);
         const userId = decodedToken.userId;
         const role = decodedToken.role;
         const email = decodedToken.email;
@@ -76,7 +76,7 @@ export function authDoctor(req, res, next) {
   export function authPharmacist(req, res, next) {
     try {
         const token = req.headers.authorization.split(' ')[1];
-        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        const decodedToken = jwt.verify(token, ""+process.env.JWT_SECRET);
         const userId = decodedToken.userId;
         const role = decodedToken.role;
         const email = decodedToken.email;
@@ -102,7 +102,7 @@ export function authDoctor(req, res, next) {
   export function authAdminSup(req, res, next) {
     try {
         const token = req.headers.authorization.split(' ')[1];
-        const decodedToken = jwt.verify(token, process.env.JWT_SECRET);
+        const decodedToken = jwt.verify(token, ""+process.env.JWT_SECRET);
         const userId = decodedToken.userId;
         const role = decodedToken.role;
         const email = decodedToken.email;

@@ -61,7 +61,7 @@ export  async function ProfilePicUpload (req,res,next){
       }
 
      const user = await User.findOneAndUpdate(
-         { email: req.body.email },
+         { numTel: req.body.numTel },
          { picture: req.file.path },
          { new: true } 
          );             

@@ -5,7 +5,7 @@ import commentRoutes from './routes/comment.js';
 import LikeDislikeRoutes from './routes/LikeDislike.js';
 import postRoutes from './routes/post.js';
 import connectToDatabase from './database.js';
-
+import path from 'path'
 import rdvroutes from './routes/rdvroutes.js'
 import userRoutes from './routes/user.js';
 import cookieParser from 'cookie-parser';
@@ -19,7 +19,11 @@ import cors from 'cors'
 import medicalRecordRoutes from './routes/medicalRecord.js';
 import allergyRoutes from './routes/allergyRoutes.js';
 import medicationRoutes from './routes/medicationRoutes.js';
+import { dirname, join } from 'path';
+import { fileURLToPath } from 'url';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 const hostname = '127.0.0.1';
 const app =express();
@@ -56,6 +60,13 @@ app.get("/logout", (req, res) => {
   res.status(201).json({ message: 'successfully logged out ' })
 })
 
+app.get('/uploads/profile-pictures/:filename', (req, res) => {
+  const filename = req.params.filename;
+  const imagePath = path.join(__dirname, 'uploads', 'profile-pictures', filename);
+
+  // Send the image file
+  res.sendFile(imagePath);
+});
 app.use('/rdv',rdvroutes);
 app.use('/prescription',prescriptionRoutes);
 app.use('/pharmacyConfirmation',pharmacyConfirmationRoutes);
