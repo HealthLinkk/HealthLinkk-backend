@@ -1,5 +1,6 @@
 import requests
 import json
+import os
 from bs4 import BeautifulSoup
 
 def scrape_medications(url):
@@ -25,8 +26,14 @@ if __name__ == "__main__":
     url_to_scrape = 'https://www.doctissimo.fr/asp/medicaments/les-medicaments-les-plus-prescrits.htm'
     
     # Vérifiez la connexion avant de scraper
-    scraped_medications = scrape_medications(url_to_scrape)
-    with open('C:\\Users\\Aziz Bouharb\\Desktop\\scraped_medications.json', 'w') as json_file:
+    scraped_medications = scrape_medications(url_to_scrape)[-89:]
+    file_path = 'scraped_medications.json'
+
+    # Get the absolute path of the file
+    absolute_path = os.path.abspath(file_path)
+
+    # Open the file using the absolute path
+    with open(absolute_path, 'w') as json_file:
         json.dump(scraped_medications, json_file)
 
     if scraped_medications is not None:

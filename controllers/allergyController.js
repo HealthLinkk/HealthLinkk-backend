@@ -6,7 +6,7 @@ import path from 'path';
 export function scrapeAllergies(req, res, next) {
   try {
     // Chemin vers le fichier JSON contenant les données d'allergies
-    const filePath = 'C:\\Users\\Aziz Bouharb\\Desktop\\scraped_data.json';
+    const filePath = '../scraped_data.json';
 
     // Lisez le contenu du fichier JSON
     const rawData = fs.readFileSync(filePath);
@@ -20,6 +20,15 @@ export function scrapeAllergies(req, res, next) {
     });
 
     res.status(200).json({ message: 'Noms d\'allergies lus depuis le fichier JSON et stockés avec succès' });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export async function getAllMedications(req, res, next) {
+  try {
+    const medications = await Medication.find();
+    res.status(200).json({ medications });
   } catch (error) {
     next(error);
   }
