@@ -1,6 +1,7 @@
 import requests
 import json
 from bs4 import BeautifulSoup
+import os
 
 def scrape_data(url):
     try:
@@ -27,7 +28,13 @@ if __name__ == "__main__":
     
     # Vérifiez la connexion avant de scraper
     scraped_data = scrape_data(url_to_scrape)
-    with open('C:\\Users\\Aziz Bouharb\\Desktop\\scraped_data.json', 'w') as json_file:
+    file_path = 'scraped_data.json'
+
+    # Get the absolute path of the file
+    absolute_path = os.path.abspath(file_path)
+
+    # Open the file using the absolute path
+    with open(absolute_path, 'w') as json_file:
         json.dump(scraped_data, json_file)
 
     if scraped_data is not None:

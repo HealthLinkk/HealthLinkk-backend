@@ -23,7 +23,7 @@ router
     .post('/', createMedicalRecord);
 
 // Get RendezVous by ID
-router.get('/byid', getMedicalRecordById);
+router.get('/byid/:id', getMedicalRecordById);
 
 // Get PatientAllergy
 router

@@ -11,8 +11,8 @@ const medicalRecordSchema = new mongoose.Schema({
   doctor: { type: mongoose.Schema.Types.ObjectId, ref: 'Doctor', required: true },
   diagnoses: [{ type: String, required: false }],
   immunizations: [{
-    name: { type: String, required: true },
-    date: { type: Date, required: true },
+    name: { type: String, required: false },
+    date: { type: Date, required: false },
   }],
   allergies: [allergySchema],  // Utiliser le schéma défini ci-dessus pour chaque allergie
   medicalNotes: { type: String, required: false },
