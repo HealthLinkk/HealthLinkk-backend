@@ -25,11 +25,3 @@ export function scrapeAllergies(req, res, next) {
   }
 }
 
-export async function getAllMedications(req, res, next) {
-  try {
-    const medications = await Medication.find();
-    res.status(200).json({ medications });
-  } catch (error) {
-    next(error);
-  }
-}
