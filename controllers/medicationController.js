@@ -2,6 +2,7 @@ import Medication from '../models/medication.js';
 import fs from 'fs';
 import { exec } from 'child_process';
 import path from 'path';
+import medication from '../models/medication.js';
 
 export async function scrapeMedications(req, res, next) {
   try {
@@ -27,3 +28,11 @@ export async function scrapeMedications(req, res, next) {
   }
 }
 
+export async function getAllMedications(req, res, next) {
+  try {
+    const medications = await Medication.find();
+    res.status(200).json({ medications });
+  } catch (error) {
+    next(error);
+  }
+}
