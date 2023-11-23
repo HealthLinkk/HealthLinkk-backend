@@ -27,7 +27,7 @@ const __dirname = dirname(__filename);
 
 const hostname = '127.0.0.1';
 const app =express();
-const port = process.env.port || 9090;
+const port = process.env.port || 9091;
 const databaseName = 'HealthLink';
 
 // Cela afichera les requêtes MongoDB dans le terminal
@@ -71,7 +71,7 @@ app.use('/rdv',rdvroutes);
 app.use('/prescription',prescriptionRoutes);
 app.use('/pharmacyConfirmation',pharmacyConfirmationRoutes);
 app.use('/pharmacist',pharmacistRoutes);
-app.use('/api/video', videoroutes);
+app.use('/api/video',videoroutes);
 app.use('/api/payment', paymentroutes);
 app.use('/post',postRoutes);
 app.use('/comment',commentRoutes);

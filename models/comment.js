@@ -16,7 +16,7 @@ const commentSchema = new Schema({
   user: {
     type: mongoose.Types.ObjectId,
     ref: "user",
-    required: true,
+    required: false,
   },
 
   date: { type: Date, default: Date.now },

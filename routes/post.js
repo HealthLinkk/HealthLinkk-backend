@@ -12,7 +12,7 @@ router.get("/Aposts", getAllPosts,auth);
 router.get("/Iposts/:id", getPostById);
 
 // // Add a new post
-router.post("/Cposts",auth, createPost);
+router.post("/Cposts", createPost);
 
 // Modify an existing post by its ID
 router.put("/Uposts/:id", updatePostById);
