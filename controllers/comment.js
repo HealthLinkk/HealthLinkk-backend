@@ -3,14 +3,15 @@ import Comment from "../models/comment.js";
 
 
   export async function  createComment(req, res) {
-    const { content, postId } = req.body;
-    const userId = req.user.id;
+    const { content, postId , author } = req.body;
+    
 
     try {
       const comment = new Comment({
         content,
         post: postId,
-        user: userId,
+        user: author
+       
       });
 
       await comment.save();
@@ -31,9 +32,8 @@ import Comment from "../models/comment.js";
     try {
       const comments = await Comment.find({ post: postId }).sort({ date: -1 });
 
-      res.status(200).json({
-        comments,
-      });
+      res.status(200).json(
+        comments);
     } catch (error) {
       res.status(500).json({
         error: error.message,
