@@ -27,7 +27,7 @@ const __dirname = dirname(__filename);
 
 const hostname = '127.0.0.1';
 const app =express();
-const port = process.env.port || 9090;
+const port = process.env.port || 9092;
 const databaseName = 'HealthLink';
 
 // Cela afichera les requêtes MongoDB dans le terminal
