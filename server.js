@@ -96,7 +96,7 @@ app.use('/medication', medicationRoutes);
 // });
 
 
-const server = app.listen(0,() => {
+const server = app.listen(0,'0.0.0.0',() => {
   console.log('Server listening on port:', server.address().port);
 });
 
