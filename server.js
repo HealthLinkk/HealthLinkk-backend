@@ -86,24 +86,24 @@ app.use('/medication', medicationRoutes);
 /**
  * Démarrer le serveur à l'écoute des connexions
  */
-app.listen(port, hostname,() => {
-  console.log(`Server running at http://${hostname}:${port}/`);
+// app.listen(port, hostname,() => {
+//   console.log(`Server running at http://${hostname}:${port}/`);
 
-})
+// })
 
-app.listen(port, () => {
-  console.log(`Serveur démarré sur le port ${port}`);
+// app.listen(port, () => {
+//   console.log(`Serveur démarré sur le port ${port}`);
+// });
+
+
+const server = app.listen(0, hostname,() => {
+  console.log('Server listening on port:', server.address().port);
 });
 
-
-// const server = app.listen(0, hostname,() => {
-//   console.log('Server listening on port:', server.address().port);
-// });
-
-// process.on('SIGINT', () => {
-//   console.log('Received SIGINT. Shutting down gracefully.');
-//   server.close(() => {
-//     console.log('Server closed');
-//     process.exit(0);
-//   });
-// });
+process.on('SIGINT', () => {
+  console.log('Received SIGINT. Shutting down gracefully.');
+  server.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
+});
