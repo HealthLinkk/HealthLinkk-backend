@@ -25,7 +25,7 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const hostname = '127.0.0.1';
+const hostname = '0.0.0.0';
 const app =express();
 const port = process.env.port || 9090
 const databaseName = 'HealthLink';
@@ -96,7 +96,7 @@ app.use('/medication', medicationRoutes);
 // });
 
 
-const server = app.listen(0,'0.0.0.0',() => {
+const server = app.listen(0,hostname,() => {
   console.log('Server listening on port:', server.address().port);
 });
 
