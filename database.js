@@ -2,12 +2,13 @@ import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 
 //connexiondatabase
+dotenv.config();
 
 const connectToDatabase = async () => {
   try {
-    const mongoURI ="mongodb+srv://Bourguiba:uTceKcvdVCwVYkQI@cluster0.xqvj5bn.mongodb.net/HealthLink";
+    const mongoURI = process.env.DB_URL;
 
-    await mongoose.connect(mongoURI, {
+    await mongoose.connect(process.env.DB_URL, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
