@@ -8,6 +8,7 @@ import upload from '../middlewares/multerConfig.js'
 import otpGenerator from 'otp-generator';
 import Otp from '../models/otp.js';
 import { sendEmail } from '../utils/mailSender.js';
+import { sendSMS } from '../utils/smsSender.js';
 
 
 export async function PatientSignUp(req, res, next) {
@@ -55,8 +56,8 @@ export  async function ProfilePicUpload (req,res,next){
       } 
       
       try {         
-      const authenticatedEmail = req.auth.email; 
-      if (authenticatedEmail !== req.body.email) {
+      const authenticatedTel = req.auth.numTel; 
+      if (authenticatedTel !== req.body.numTel) {
         return res.status(403).json({ error: 'Permission denied. You can only change your own picture.' });
       }
 
@@ -215,6 +216,8 @@ export async function sendOTP(req,res,next){
         });
 
         await otpDocument.save();
+        const Tnumtel ="+216" + req.body.numTel
+        sendSMS(Tnumtel,otp)
         res.status(200).json({ message: "OTP Sent"});
 
 } catch (error) {
@@ -315,7 +318,7 @@ export async function ProfileEdit(req, res, next) {
           return res.status(404).json({ message: `Cannot update user with ID ${userId}. User not found.` });
         }
 
-        return res.status(200).json({ message: 'Profile updated', user });
+        return res.status(200).json(user);
       })
       .catch((error) => {
         return res.status(500).json({ error: 'Failed to update profile' });

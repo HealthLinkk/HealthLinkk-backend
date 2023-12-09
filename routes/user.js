@@ -44,7 +44,7 @@ router
 
 router
   .route('/updatePicture')
-  .patch(authDoctor,ProfilePicUpload);
+  .patch(auth,ProfilePicUpload);
 
 router
   .route('/AllUsers')
