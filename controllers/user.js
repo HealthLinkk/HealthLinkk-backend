@@ -55,11 +55,11 @@ export  async function ProfilePicUpload (req,res,next){
         return res.status(500).json({ error: err.message }); 
       } 
       
-      try {         
-      const authenticatedTel = req.auth.numTel; 
-      if (authenticatedTel !== req.body.numTel) {
-        return res.status(403).json({ error: 'Permission denied. You can only change your own picture.' });
-      }
+       try {         
+      // // const authenticatedTel = req.auth.numTel; 
+      // // if (authenticatedTel !== req.body.numTel) {
+      // //   return res.status(403).json({ error: 'Permission denied. You can only change your own picture.' });
+      // // }
 
      const user = await User.findOneAndUpdate(
          { numTel: req.body.numTel },
