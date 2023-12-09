@@ -67,12 +67,12 @@ export  async function ProfilePicUpload (req,res,next){
          { new: true } 
          );             
          if (!user) {
-          return res.status(404).json({ error: 'User not found' });
+          return res.status(404).json({ message: 'User not found' });
           }
                         
-         return res.status(200).json({ message: 'Profile picture updated', user });
+         return res.status(200).json(user);
          } catch (error) {
-            return res.status(500).json({ error: 'Failed to update profile picture' });  
+            return res.status(500).json({ message: 'Failed to update profile picture' });  
         }
     })     
     
