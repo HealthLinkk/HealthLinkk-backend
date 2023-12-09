@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
     numTel: { type: Number, required: true ,unique:true },
     location: { type: String, required: false },
     
-    picture: { type: String, required : false },
+    picture: { type: String, required : false , default: "uploads/profile-pictures/picture-1702129363549-516697354.png"},
     role: { type: String, enum: ['Doctor', 'Patient', 'Pharmacist', 'AdminSup'], required: true },   
   });
 
