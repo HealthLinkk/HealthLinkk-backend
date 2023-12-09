@@ -96,14 +96,14 @@ app.use('/medication', medicationRoutes);
 // });
 
 
-// const server = app.listen(() => {
-//   console.log('Server listening on port:', server.address().port);
-// });
+const server = app.listen(443,hostname,() => {
+  console.log('Server listening on port:', server.address().port);
+});
 
-// process.on('SIGINT', () => {
-//   console.log('Received SIGINT. Shutting down gracefully.');
-//   server.close(() => {
-//     console.log('Server closed');
-//     process.exit(0);
-//   });
-// });
+process.on('SIGINT', () => {
+  console.log('Received SIGINT. Shutting down gracefully.');
+  server.close(() => {
+    console.log('Server closed');
+    process.exit(0);
+  });
+});
