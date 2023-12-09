@@ -67,6 +67,9 @@ app.get('/uploads/profile-pictures/:filename', (req, res) => {
   // Send the image file
   res.sendFile(imagePath);
 });
+app.get('/',(req,res) => {
+  return res.status(200).json({message : 'HealthLink'})
+})
 app.use('/rdv',rdvroutes);
 app.use('/prescription',prescriptionRoutes);
 app.use('/pharmacyConfirmation',pharmacyConfirmationRoutes);
