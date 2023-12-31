@@ -48,7 +48,7 @@ router
 
 router
   .route('/AllUsers')
-  .get(authAdminSup,getAllUsers)
+  .get(getAllUsers)
 
 router
   .route('/editProfile')
